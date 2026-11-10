@@ -361,8 +361,235 @@ Named as out of scope so it cannot be skipped silently: no database, no HTTP
 API, no auth (M3); no policies or monitor (M5); no change to any file under
 `data/` or to any compared artefact (NIF). The frozen chain gains nothing here.
 
+### Stop point (reached 2026-11-09, satisfied 2026-11-10)
+
+Section 13.5's stop at the Section 13.1 gate table was reached on 2026-11-09
+and the owner approved it on 2026-11-10. The closure is Section 6 below. This
+block remains the baseline the M2 gate was read against; it claims nothing
+proven.
+
+---
+
+## 6. Milestone M2 closure — 2026-11-10 (PRD §13.5)
+
+The owner approved the M2 stop point on 2026-11-10 with the instruction
+"批准，请按照你的思路建议进行", delegating the six follow-ups in Section 9 of
+the M2 report. The readings below are what M2 proved; the narrative, the ten
+§13.2 sections, the liveness table, seven deviations and the disclosures are in
+`~/laya-evidence/m2-2026-11-09/report-2026-11-09-m2-replay-engine.md`
+(sha256 `e417d15e…`), beside `gate_table.log` (sha256 `5d01eb8f…`), the `gate/`
+logs, `ci_42610673606_full.log` and the independent review
+`review-2026-11-10-m2-independent.md` (sha256 `9fe2017a…`).
+
+### Decisions taken (F1–F6)
+
+| # | Decision | Value | Basis |
+|---|---|---|---|
+| F1 | Container-backed AC4/AC9 evidence | Accepted as **CI-only** for M2–M4; M3's container exit gate runs in CI. Provisioning an egress runner remains an option, not a condition | §5.11 AC4/AC9 need Docker and PyPI egress. This machine's containers return `[Errno 101]`, so the local container attempt is recorded as `refused` (rc 4, `exit_code: 1`) and never as a pass, and `doctor` reports `container-network fail`. CI `42610673606` supplies `argv[0]=docker`, AC4 rc 4 and two container `certified` replays. **No gate was waived**: the missing half is supplied elsewhere, not forgiven |
+| F2 | `started_at` on the run row | **Add the field as M3's first source task**; §4.3 is not edited | §0.5 bars M1–M4 from changing files `verify` compares, and the PRD sits on that chain. A field on `RunRow` changes no invariant-carrying field. Deferred out of this session deliberately: the approved gate table is bound to `a1a1cc0` / `9d8e145` and no source edit may silently move that tip |
+| F3 | Coverage floor | **None, on purpose, recorded as such.** Re-evaluate at M5 | §13.1 defines no coverage gate. A floor set at today's number is a ratchet on a suite M3 will reshape. This neither adds nor removes a guard: there was none to lower |
+| F4 | §13.1 gate table and M2 | **Approved and closed 2026-11-10** | Owner's instruction above; §13.5 stop point; the independent reviewer had already judged the report a valid input to this approval |
+| F5 | Independent review | **Confirmed**: 1 MUST FIX + 3 SHOULD FIX, all four CLOSED on the closure pass; the non-blocking `REPRO_RC` provenance was also supplied | `review-2026-11-10-m2-independent.md` (Closure verification) and `gate/export_present_repro_rc.txt`. The reviewer explicitly did not approve M2 and did not re-run the milestone; approval was the owner's, not the author's or reviewer's |
+| F6 | The counted `docs/` deviation (D7) | **Accepted as M1 §4 did. No §7 freeze round** | The single path is this ledger, which is not a byte-compared artefact. `GATE_PUBLISHED_DATA_CHANGED=0`, `verify` still prints `re-derived 649 /649 values`, and the packet is built from `e9b0cf1`. §7's freeze round is triggered by a change that would *move* a published artefact; none moved here. This is a counted exception under §13.1, not an §0.5 NIF breach |
+
+### Readings that close M2
+
+| Reading | Value at 2026-11-10 | Where it was read |
+|---|---|---|
+| tips | portal gate `a1a1cc0`, closure `9d8e145` (two doc-only commits, pushed); frozen `230e40b`, both trees clean | `gate_table.log` header, `git log` |
+| portal CI | `42610673606` and `42799336470` (the doc-only tip), both jobs success | `ci_42610673606_full.log`, `ci_42799336470_full.log`, `gate/ci_42799336470_result.json` |
+| NIF | `GATE_NIF_RC=0`, `re-derived 649 /649 values` | `gate/nif.log` |
+| published artefacts | `GATE_PUBLISHED_DATA_CHANGED=0`; `GATE_PUBLISHED_DATA_DOCS_CHANGED=1`, the one path is the ledger | `gate_table.log`, `gate/published_delta.txt` |
+| portal suite | 11 files / 99 tests, `GATE_SUITE_RC=0`; `GATE_NEW_FILES_RC=0` with 50 dots across five files; ruff and compileall rc 0 | `gate/suite.log`, `gate/collect_only.log`, `gate/new_files.log` |
+| plants | `total=31 runtime_landed=31 red=31 restored=31`, locally and in CI | `gate/plants.log`, `ci_42610673606_full.log` |
+| leak test | `GATE_LEAK_HITS=7`, all seven the PRD's own phrase "no longer" | `gate/leak.txt` |
+| AC4 | `mismatch` rc 4, both digests named, `611 /612` vs `612 /612`; CI's container copy rc 4 with `argv[0]=docker` | `gate/ac4*`, CI log |
+| AC9 | two attempts, two rows, both `certified 612 /612`; CI two container `certified` | `gate/ac9*`, `gate/runs.jsonl` |
+| AC10 | `not-run` rc 3, `argv: []`, `exit_code: null`; CI `SHAREABLE_REPLAY_RC=3` | `gate/ac10*`, CI log |
+| container attempt | `refused` rc 4, `exit_code: 1` — never a pass | `gate/container_attempt.log` |
+| run store | `GATE_RUNS_ROWS=5` for five attempts | `gate/runs.jsonl`, `gate/runs_list.log` |
+| `doctor` | uv rc 0 all ok; container rc 3 `container-network fail`; no-docker rc 3 | `gate/doctor_*` |
+| export lane | 146 tracked paths; `GATE_EXPORT_RC=0`, `1227 passed, 31 skipped in 539.23s`; corpus-absent `verify` rc 0 at `612 /612` | `gate/export_pytest.log`, `gate/export_verify.log` |
+| liveness | I2 and I5 `ACTIVE (M2)`, I6 `ACTIVE (M1)`; I1/I3/I4 `UNPROVEN`; parity `N/A` (§6.3) | report §5 |
+
+### Correction, not annotation (Section 8.3)
+
+Five sentences were rewritten in place rather than left standing with a note
+beneath them. Section 5's "Stop point" now says the stop was reached and
+satisfied; it had said "stop for the owner's approval" in the present tense.
+The M2 plan's export-lane row named only `AUTORATE_TRACKED_FILES`, which ran the
+wrong lane (`b044191`); the same paragraph then repeated a miscount,
+`1256 passed, 7 skipped`, which the re-executed lane disproved —
+`1255 passed, 3 skipped in 684.16s` (`9d8e145`). The report's two occurrences
+of that number were corrected the same way. Four gate tables were discarded,
+not annotated: `gate_table_v1.log` (AC4 rc 125 before `--image`),
+`gate_table_v4_corrupt.log` (a script rewritten while running produced a
+spliced line), `gate_table_v5_prelane_fix.log` (corpus-present export lane;
+`GATE_COLLECTED=11` was a file count wearing a test-count name) and
+`gate_table_v6_docker_down.log` (the container row degraded to `not-run`, the
+same reading as AC10, so it proved nothing). They remain in the evidence
+directory because deleting them would hide the corrections.
+
+### Deviation, counted
+
+This commit changes one file under `docs/`, so
+`git diff --name-only 230e40b..HEAD -- data/ docs/` returns one path (this
+ledger) and `git diff --name-only 230e40b..HEAD -- data/` returns **0**.
+`verify` still exits 0 at **649 /649**; the packet is built from `e9b0cf1`, so
+no published artefact moved. Section 13.1's published-artefact row therefore
+reads **1**, not 0 — the same counted exception M1's Section 4 registers and
+the one F6 accepts.
+
+### Stop point for the next session
+
+Section 13.5's resume opener says "This session: <M1|M2|M3|M4|M5> only" and
+"Do not carry the previous session's approval forward", and it requires the
+Section 0.4 baseline to be **re-run** because the stored baseline is history.
+This session therefore ends here: no M3 plan file, no portal source edit, no
+`data/` change. M3 starts in a new session with B1–B5 re-captured and committed
+to this ledger before its first source edit. Its Section 7 row is auth,
+orgs/projects, F1 ingest, F2 certificate view, F3 slice view and the
+provenance drawer; its gate is AC2, AC3, AC13, AC14 and a green parity job
+(§6.3), with a read-only deployment first. F2's `started_at` is the first
+source task.
+
+This Section 6 commit was fast-forwarded onto **both** remote branches: `main`,
+which is the default branch CI checks out, and `integration/f8-into-main`. The
+first push reached only the latter, leaving `main` at `230e40b` — a state in
+which the next session's B1 and the CI checkout would have read the still-open
+M2 baseline. Both branches now carry the closure, and remote `HEAD` resolves to
+it.
+
+---
+
+## 7. Milestone M3 opening — 2026-11-10 (PRD §0.4, §13.5)
+
+The owner supplied the Section 13.5 resume opener verbatim with
+`This session: M3 only` on 2026-11-10. Section 0.4 was re-run from scratch at
+the current HEAD (`386dc9e`), not copied from Section 5: HEAD has moved by two
+commits since the M2 opening, so those readings are history. Every exit code
+below comes from its own command, captured by `echo "NAME_EXIT=$?"` immediately
+after a redirect; logs are in `~/laya-evidence/m3-2026-11-10/gate/`.
+
+### B1 — identity
+
+```text
+$ git rev-parse --abbrev-ref HEAD
+integration/f8-into-main
+
+$ git rev-parse --short HEAD
+386dc9e
+```
+
+`B1A_EXIT=0` · `B1B_EXIT=0`. `git ls-remote` confirms remote `main`,
+`integration/f8-into-main` and `HEAD` all resolve to `386dc9e`.
+
+### B2 — working tree
+
+```text
+$ git status --short
+```
+
+Empty output, 0 lines. `B2_EXIT=0`, `B2_LINES=0`.
+
+### B3 — the honesty gate
+
+```text
+$ uv run --frozen autorate verify --protocol protocol.json
+protocol: protocol.json ce43f8e29cc1 (frozen 2026-10-17)
+inventory source: recomputed from the corpus
+disclosure: corpus present: inventory, digests and the snapshot all re-derived;
+            the frozen protocol rubric was enforced
+re-derived 649 /649 values
+```
+
+`B3_EXIT=0`. Lane **corpus present**; NIF reference denominator **649 /649**,
+unchanged from the M2 opening.
+
+### B3A — clean-clone lane, measured not inferred
+
+The opener warns that a locally green tree has turned red in CI once, because
+the frozen repo's CI reads an object database a shallow checkout lacks. So the
+corpus-absent reading was re-executed rather than carried forward:
+
+```text
+$ git archive HEAD | tar -x -C <dir> ; git ls-files > <dir>/.tracked-files
+M3_EXPORT_MANIFEST_LINES=146
+
+$ env -u PYTHONPATH AUTORATE_FEISHU_ROOT=/nonexistent \
+    AUTORATE_TRACKED_FILES=<dir>/.tracked-files \
+    uv run --frozen autorate verify --protocol protocol.json
+inventory source: committed data/inventory.md.json
+disclosure: corpus absent: 9 SOURCE.json digests and the inventory snapshot are
+            transcribed from the committed data/inventory.md.json, not recomputed
+re-derived 612 /612 values
+```
+
+`M3_CLEAN_CLONE_VERIFY_RC=0`. This is an **additional** reading, not one of
+Section 0.4's five; it establishes both lanes at this tip.
+
+### B4 — command surface
+
+```text
+$ uv run --frozen autorate --help
+snapshot, export-feishu, certify, severity, compare, gate, report, audit,
+protocol, verify
+```
+
+`B4_EXIT=0`, 10 subcommands, unchanged. Section 7 puts all of M3 in the portal
+repo; the frozen CLI surface gains nothing.
+
+### B5 — adoption blocker
+
+```text
+$ gh repo view --json visibility,stargazerCount
+{"stargazerCount":1,"visibility":"PUBLIC"}
+```
+
+`B5_EXIT=0`. Unchanged.
+
+### M3 scope, and what is deliberately not in it
+
+Section 7's M3 row (verbatim deliverable): **auth, orgs/projects, F1 ingest,
+F2 certificate view, F3 slice view, provenance drawer**; gate **AC2, AC3, AC13,
+AC14**, the frozen repo's committed artefacts rendering correctly end-to-end,
+and the **parity job (§6.3) green**; rollback point **read-only deployment
+first (no policies yet)**. Stack is fixed by §4.2: FastAPI + SQLAlchemy on
+SQLite (PostgreSQL by one env var) + Alembic + Pydantic, one process, one port.
+
+Two invariants turn `ACTIVE (M3)` in §6.1 — **I1** (no statistic computed in the
+app tier; the static rule and the ORM-aggregate plant) and **I3** (a refusal
+renders as a refusal, verbatim). I2 and I5 are `ACTIVE (M2)` and must not
+regress; I6 stays `ACTIVE (M1)`; I4 stays `UNPROVEN (M4)`. §6.2 forbids any
+skip/xfail/ignore/exemption to get green.
+
+The first source task is the **follow-up** named F2 in Section 6 — add
+`started_at` to the M2 `RunRow` — not functional feature F2 (the certificate
+view). No invariant-carrying field changes.
+
+Named out of scope so it cannot be skipped silently: M4's claim check, auditor
+export and localization; M5's policies, monitor, in-browser verifier and the
+`--format json` freeze round; any change to `data/` or to a file `verify`
+byte-compares (§0.5 NIF); any endpoint that computes a bound (I1 / §3.4 NG7);
+§0.2 carve-out (a) irreversible public exposure and (b) outbound messages to
+named third parties.
+
+### Session boundary, disclosed
+
+Section 13.5 says `This session: … only` and `Do not carry the previous
+session's approval forward`. From the executor's side, M2's closure (Section 6)
+and this M3 opener arrived in the **same conversation window**, with a context
+compaction between them; the formal one-milestone-per-session boundary is
+therefore under tension. It is handled by substance, not by silence: this pass
+does M3 only; **M2's approval is not carried forward** (the Section 13.1 gate
+table needs a fresh owner approval for M3); Section 0.4 was re-run rather than
+copied; this ledger block is committed before any source edit; and the pass
+stops at the Section 13.1 gate table. If the owner judges the formal boundary
+binding, the correct remedy is to refuse this milestone's gate table and reopen
+M3 in a fresh window, not to edit this record.
+
 ### Stop point
 
-Section 13.5: stop for the owner's approval at the Section 13.1 gate table.
-This block is the baseline the M2 gate will be read against; it claims nothing
-proven.
+Section 13.5: stop for the owner's approval at the Section 13.1 gate table,
+with the Section 13.2 report and liveness table. This block is the baseline M3
+will be read against; it claims nothing proven.
